@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.10-slim
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -13,4 +13,4 @@ RUN pip install --no-cache-dir --upgrade -r requirements.txt
 # - `-w 4`: Uses 4 worker processes for handling requests
 # - `-b 0.0.0.0:7860`: Binds the server to port 7860 on all network interfaces
 # - `app:app`: Runs the Flask app (assuming `app.py` contains the Flask instance named `app`)
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:7860", "app:rental_price_predictor_api"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:7860", "app:sales_revenue_predictor_api"]

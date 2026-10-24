@@ -3,7 +3,8 @@ import pandas as pd
 import requests
 
 # Base URL of the Flask backend
-BACKEND_URL = "http://backend:7860"
+import os
+BACKEND_URL = os.getenv("BACKEND_URL", "http://backend:7860").rstrip("/")
 
 # Set the title of the Streamlit app
 st.title("SuperKart Supermarket Sales Revenue Prediction")
@@ -16,12 +17,12 @@ Product_Weight = st.number_input("Product Weight", min_value=0.0, value=12.65)
 Product_Sugar_Content = st.selectbox('Product Sugar Content', ['Low Sugar', 'Regular', 'No Sugar', 'reg'])
 Product_Allocated_Area = st.number_input("Product Allocated Area", min_value=0.0, value=0.07)
 Product_Type = st.selectbox('Product Type', ['Frozen Foods', 'Dairy', 'Canned', 'Baking Goods', 'Health and Hygiene', 'Snack Foods', 'Meat', 'Household', 'Hard Drinks', 'Fruits and Vegetables', 'Breads', 'Soft Drinks', 'Breakfast', 'Others', 'Starchy Foods', 'Seafood'])
-Product_MRP = st.number_input("Review Score Rating", min_value=0.0, value=147.03)
+Product_MRP = st.number_input("Product MRP", min_value=0.0, value=147.03)
 Store_Id = st.selectbox('Store Id', ['OUT004', 'OUT003', 'OUT001', 'OUT002'])
 Store_Size = st.selectbox('Store Size', ['Medium', 'High', 'Small'])
 Store_Location_City_Type = st.selectbox('Store Location City Type', ['Tier 2', 'Tier 1', 'Tier 3'])
 Store_Type = st.selectbox('Store Type', ['Supermarket Type2', 'Departmental Store', 'Supermarket Type1', 'Food Mart'])
-Store_Establishment_Year = st.number_input("Review Score Rating", min_value=0, max_value=2026, step=1, value=2002)
+Store_Establishment_Year = st.number_input("Store Establishment Year", min_value=0, max_value=2026, step=1, value=2002)
 
 # Convert user input into a DataFrame
 input_data = pd.DataFrame([{
@@ -55,7 +56,9 @@ uploaded_file = st.file_uploader("Upload CSV file for batch prediction", type=["
 # Make batch prediction when the "Predict Batch" button is clicked
 if uploaded_file is not None:
     if st.button("Predict Batch", type="primary"):
-        response = requests.post(f"{BACKEND_URL}/v1/predictbatch", files={"file": uploaded_file})  # Send file to Flask API
+        uploaded_file.seek(0)
+        files = {"file": (uploaded_file.name, uploaded_file.getvalue(), "text/csv")}
+        response = requests.post(f"{BACKEND_URL}/v1/predictbatch", files=files)  # Send file to Flask API
         if response.status_code == 200:
             predictions = response.json()
             st.success("Batch predictions completed!")
